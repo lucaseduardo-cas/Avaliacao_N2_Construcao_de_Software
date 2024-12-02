@@ -4,7 +4,7 @@
 #include <time.h>
 #include <locale.h>
 
-#define FILENAME "tarefas.txt"
+
 
 typedef struct {
     int id;
