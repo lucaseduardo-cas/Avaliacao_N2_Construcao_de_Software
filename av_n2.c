@@ -4,6 +4,9 @@
 #include <time.h>
 #include <locale.h>
 
+#define MAX_TAREFAS 100
+#define MAX_TITULO 50
+#define MAX_DESCRICAO 100
 #define FILENAME "tarefas.txt"
 
 typedef struct {
@@ -13,6 +16,40 @@ typedef struct {
     char status[20]; // "Pendente", "Em andamento", "Concluído"
     char data_criacao[20];
 } Tarefa;
+
+// Função para obter o timestamp atual
+void obterDataAtual(char *buffer) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    sprintf(buffer, "%02d/%02d/%d %02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
+}
+
+// Função para salvar todas as tarefas no arquivo
+void salvarTarefas(Tarefa tarefas[], int total) {
+    FILE *file = fopen(FILENAME, "w");
+    if (!file) {
+        printf("Erro ao abrir o arquivo para salvar tarefas.\n");
+        return;
+    }
+    for (int i = 0; i < total; i++) {
+        fprintf(file, "%d|%s|%s|%s|%s\n", tarefas[i].id, tarefas[i].titulo, tarefas[i].descricao, tarefas[i].status, tarefas[i].data_criacao);
+    }
+    fclose(file);
+}
+
+// Função para carregar tarefas do arquivo
+int carregarTarefas(Tarefa tarefas[]) {
+    FILE *file = fopen(FILENAME, "r");
+    if (!file) {
+        return 0; // Arquivo ainda não existe
+    }
+    int total = 0;
+    while (fscanf(file, "%d|%[^|]|%[^|]|%[^|]|%[^\n]\n", &tarefas[total].id, tarefas[total].titulo, tarefas[total].descricao, tarefas[total].status, tarefas[total].data_criacao) != EOF) {
+        total++;
+    }
+    fclose(file);
+    return total;
+}
 
 int main() {
     setlocale (LC_ALL, "Portuguese");
